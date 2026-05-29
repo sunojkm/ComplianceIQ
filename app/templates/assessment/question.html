@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-8">
+    <div class="mb-6">
+        <div class="flex justify-between text-sm text-gray-500 mb-1">
+            <span>Question {{ index + 1 }} of {{ total }}</span>
+            <span>{{ progress }}% complete</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="bg-yellow-400 h-2 rounded-full" style="width: {{ progress }}%"></div>
+        </div>
+    </div>
+    <div class="mb-2">
+        <span class="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-medium">{{ question.theme }}</span>
+        <span class="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-medium ml-1">{{ question.control }}</span>
+        <span class="inline-block text-xs px-2 py-1 rounded font-medium ml-1
+            {% if question.weight == 3 %}bg-red-100 text-red-700{% elif question.weight == 2 %}bg-yellow-100 text-yellow-700{% else %}bg-green-100 text-green-700{% endif %}">
+            Weight: {{ question.weight }}
+        </span>
+    </div>
+    <h2 class="text-xl font-semibold text-gray-900 mb-8 leading-relaxed">{{ question.text }}</h2>
+    <form method="POST">
+        <div class="flex gap-4">
+            <button type="submit" name="answer" value="YES" class="flex-1 bg-green-600 text-white font-bold py-4 rounded-lg text-lg hover:bg-green-700">✓ YES</button>
+            <button type="submit" name="answer" value="NO"  class="flex-1 bg-red-500  text-white font-bold py-4 rounded-lg text-lg hover:bg-red-600">✗ NO</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
