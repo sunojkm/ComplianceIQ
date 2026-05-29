@@ -236,30 +236,6 @@ All planned expansions are tracked in [ROADMAP.md](ROADMAP.md).
 
 ---
 
-## Contributing
-
-Contributions are welcome — especially for additional framework modules. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request.
-
-Areas where contributions are most needed:
-- Adding the remaining 50 ISO 27001 Annex A controls to `questions.py`
-- NIST CSF 2.0 framework module
-- GDPR, HIPAA, PCI-DSS, SOC 2, and HITRUST framework modules
-- Pytest test suite for scoring engine and questionnaire logic
-- UI improvements and accessibility enhancements
-
----
-
-## Academic Context
-
-This project is developed as a **Minor Project (21CSA697A)** for the Master of Computer Applications (MCA) — Cybersecurity program at **Amrita AHEAD, Amrita Vishwa Vidyapeetham**.
-
-- **Student:** Sunoj K M
-- **Roll Number:** AA.SC.P2MCA25017018
-- **Batch:** April 2025
-- **Registered Topic:** Automated Security Risk Assessment Tool for Small Organizations
-
----
-
 ## Licence
 
 This project is licensed under the **MIT Licence** — see [LICENSE](LICENSE) for details.
