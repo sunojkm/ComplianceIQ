@@ -7,7 +7,8 @@ import os
 
 db = SQLAlchemy()
 login_manager = LoginManager()
-limiter = Limiter(get_remote_address, default_limits=["200 per day", "50 per hour"])
+# limiter = Limiter(get_remote_address, default_limits=["200 per day", "50 per hour"])
+limiter = Limiter(get_remote_address, default_limits=[])
 
 def create_app():
     app = Flask(__name__)
@@ -19,7 +20,8 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     limiter.init_app(app)
-    login_manager.login_view = 'auth.register'
+    login_manager.login_view = 'auth.landing'
+    # login_manager.login_view = 'auth.login'
 
     from app.auth import auth as auth_blueprint
     from app.main import main as main_blueprint

@@ -29,6 +29,7 @@
         </div>
         <div class="ml-auto text-right">
             <a href="{{ url_for('assessment.download_pdf') }}"
+               onclick="showDownloadPopup()"
                class="inline-block bg-gray-900 text-yellow-400 font-bold px-5 py-2 rounded hover:bg-gray-800 text-sm">
                 ⬇ Download PDF Report
             </a>
@@ -62,7 +63,7 @@
                     </div>
                 </div>
                 {% endfor %}
-                <!-- Risk Scale Legend -->
+                <!-- Legend -->
                 <div class="flex gap-3 mt-4 text-xs">
                     <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>Low 80%+</span>
                     <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-yellow-400 inline-block"></span>Medium 60%+</span>
@@ -90,9 +91,13 @@
                     <div class="flex items-center gap-3">
                         <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">{{ w.control }}</span>
                         <span class="text-sm font-medium text-gray-800">{{ w.theme }}
-                            {% if w.weight == 3 %}<span class="ml-2 text-xs bg-red-100 text-red-700 px-1 py-0.5 rounded">Critical</span>
-                            {% elif w.weight == 2 %}<span class="ml-2 text-xs bg-yellow-100 text-yellow-700 px-1 py-0.5 rounded">Important</span>
-                            {% else %}<span class="ml-2 text-xs bg-green-100 text-green-700 px-1 py-0.5 rounded">Advisory</span>{% endif %}
+                            {% if w.weight == 3 %}
+                            <span class="ml-2 text-xs bg-red-100 text-red-700 px-1 py-0.5 rounded">Critical</span>
+                            {% elif w.weight == 2 %}
+                            <span class="ml-2 text-xs bg-yellow-100 text-yellow-700 px-1 py-0.5 rounded">Important</span>
+                            {% else %}
+                            <span class="ml-2 text-xs bg-green-100 text-green-700 px-1 py-0.5 rounded">Advisory</span>
+                            {% endif %}
                         </span>
                     </div>
                     <span class="text-gray-400 text-xs" id="w{{ loop.index }}-icon">▼</span>
@@ -145,6 +150,35 @@
     </div>
 </div>
 
+<!-- Download Popup -->
+<div id="download-popup" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl p-8 max-w-sm w-full mx-4 text-center">
+
+        <!-- Loading State -->
+        <div id="popup-loading">
+            <div class="text-5xl mb-4">📄</div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Preparing Your Report</h3>
+            <p class="text-gray-500 text-sm mb-2">Your PDF report is being generated and will download shortly.</p>
+            <p class="text-gray-400 text-xs">Please do not close this page.</p>
+            <div class="mt-4 flex justify-center">
+                <div class="w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        </div>
+
+        <!-- Success State -->
+        <div id="popup-success" class="hidden">
+            <div class="text-5xl mb-4">✅</div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Download Complete!</h3>
+            <p class="text-gray-500 text-sm mb-6">Your compliance report has been downloaded successfully.</p>
+            <button onclick="closeDownloadPopup()"
+                class="w-full bg-gray-900 text-yellow-400 font-bold py-2 rounded hover:bg-gray-800">
+                Close
+            </button>
+        </div>
+
+    </div>
+</div>
+
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -177,11 +211,25 @@ new Chart(ctx, {
                 grid: { color: 'rgba(0,0,0,0.08)' }
             }
         },
-        plugins: {
-            legend: { display: false }
-        }
+        plugins: { legend: { display: false } }
     }
 });
+
+function showDownloadPopup() {
+    document.getElementById('download-popup').classList.remove('hidden');
+    document.getElementById('popup-loading').classList.remove('hidden');
+    document.getElementById('popup-success').classList.add('hidden');
+    setTimeout(function() {
+        document.getElementById('popup-loading').classList.add('hidden');
+        document.getElementById('popup-success').classList.remove('hidden');
+    }, 3500);
+}
+
+function closeDownloadPopup() {
+    document.getElementById('download-popup').classList.add('hidden');
+    document.getElementById('popup-loading').classList.remove('hidden');
+    document.getElementById('popup-success').classList.add('hidden');
+}
 
 function toggleSection(bodyId, iconId) {
     const body = document.getElementById(bodyId);

@@ -17,13 +17,13 @@ class User(UserMixin, db.Model):
     assessments   = db.relationship('Assessment', backref='user', lazy=True)
 
 class Assessment(db.Model):
-    id           = db.Column(db.Integer, primary_key=True)
-    user_id      = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    started_at   = db.Column(db.DateTime, default=datetime.utcnow)
-    completed_at = db.Column(db.DateTime, nullable=True)
-    overall_score= db.Column(db.Float, nullable=True)
-    risk_level   = db.Column(db.String(20), nullable=True)
-    responses    = db.relationship('Response', backref='assessment', lazy=True)
+    id            = db.Column(db.Integer, primary_key=True)
+    user_id       = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    started_at    = db.Column(db.DateTime, default=datetime.utcnow)
+    completed_at  = db.Column(db.DateTime, nullable=True)
+    overall_score = db.Column(db.Float, nullable=True)
+    risk_level    = db.Column(db.String(20), nullable=True)
+    responses     = db.relationship('Response', backref='assessment', lazy=True)
 
 class Response(db.Model):
     id            = db.Column(db.Integer, primary_key=True)

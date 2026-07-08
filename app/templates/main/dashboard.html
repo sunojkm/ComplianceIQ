@@ -1,19 +1,172 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="bg-white rounded-lg shadow p-8">
-    <div class="flex items-center gap-4 mb-6">
-        <div class="bg-yellow-400 rounded-full w-14 h-14 flex items-center justify-center text-2xl font-bold text-gray-900">
-            {{ user.company_name[0] }}
+
+<div class="bg-white rounded-lg shadow p-8 mb-6">
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-4">
+            <div class="bg-yellow-400 rounded-full w-14 h-14 flex items-center justify-center text-2xl font-bold text-gray-900">
+                {{ user.company_name[0].upper() }}
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">Welcome, {{ user.company_name }}</h2>
+                <p class="text-gray-400 text-sm">ISO 27001 Annex A Risk Assessment</p>
+            </div>
         </div>
-        <div>
-            <h2 class="text-2xl font-bold text-gray-900">Welcome, {{ user.company_name }}</h2>
-            <p class="text-gray-500 text-sm">{{ user.industry }} · {{ user.business_size }}</p>
-        </div>
+        <a href="{{ url_for('main.profile') }}"
+            class="text-sm text-gray-500 hover:text-yellow-500 font-medium border border-gray-200 px-4 py-2 rounded hover:border-yellow-400 transition">
+            👤 My Profile
+        </a>
     </div>
     <div class="border-t pt-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-2">ISO 27001 Annex A Assessment</h3>
-        <p class="text-gray-500 text-sm mb-6">Complete 43 questions across four control themes. Your results will include a risk score, identified weaknesses, and a recommended control checklist.</p>
-        <a href="{{ url_for('assessment.start') }}" class="inline-block bg-gray-900 text-yellow-400 font-bold px-6 py-3 rounded hover:bg-gray-800">Start Assessment →</a>
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">Start a New Assessment</h3>
+        <p class="text-gray-500 text-sm mb-6">Complete 43 questions across four ISO 27001 Annex A control themes. Receive a risk score, identified weaknesses, and a recommended control checklist.</p>
+        <a href="{{ url_for('assessment.start') }}"
+            class="inline-block bg-gray-900 text-yellow-400 font-bold px-6 py-3 rounded hover:bg-gray-800">
+            Start New Assessment →
+        </a>
     </div>
 </div>
+
+{% if assessments %}
+<div class="bg-white rounded-lg shadow p-8">
+    <h3 class="text-lg font-bold text-gray-900 mb-4">Previous Assessments</h3>
+    <div class="space-y-3">
+        {% for a in assessments %}
+        {% if a.completed_at %}
+        <div class="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:border-yellow-400 transition">
+            <div class="flex items-center gap-4">
+                <div class="text-2xl font-bold
+                    {% if a.risk_level == 'Low' %}text-green-600
+                    {% elif a.risk_level == 'Medium' %}text-yellow-500
+                    {% elif a.risk_level == 'High' %}text-orange-500
+                    {% else %}text-red-600{% endif %}">
+                    {{ a.overall_score | int }}%
+                </div>
+                <div>
+                    <span class="px-2 py-0.5 rounded text-xs font-bold
+                        {% if a.risk_level == 'Low' %}bg-green-100 text-green-700
+                        {% elif a.risk_level == 'Medium' %}bg-yellow-100 text-yellow-700
+                        {% elif a.risk_level == 'High' %}bg-orange-100 text-orange-700
+                        {% else %}bg-red-100 text-red-700{% endif %}">
+                        {{ a.risk_level }} Risk
+                    </span>
+                    <p class="text-gray-400 text-xs mt-1">
+                        {{ a.completed_at.strftime('%d %b %Y, %I:%M %p') }}
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="{{ url_for('assessment.view_results', assessment_id=a.id) }}"
+                    class="text-sm text-yellow-500 font-bold hover:underline">
+                    View Report →
+                </a>
+                <button onclick="confirmDelete({{ a.id }}, '{{ a.completed_at.strftime('%d %b %Y') }}')"
+                    class="text-sm text-red-400 hover:text-red-600 font-medium">
+                    🗑 Delete
+                </button>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<p class="text-xs text-gray-400 mt-6 text-center">
+    ComplianceIQ is an educational tool. Assessment results are self-reported
+    and do not constitute formal ISO 27001 certification or legal compliance advice.
+</p>
+
+<!-- Step 1 Confirmation Modal -->
+<div id="modal-step1" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl p-8 max-w-md w-full mx-4">
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Delete Assessment?</h3>
+        <p class="text-gray-500 text-sm mb-6">
+            You are about to delete the assessment from
+            <span id="modal-date" class="font-semibold text-gray-700"></span>.
+            This action cannot be undone.
+        </p>
+        <div class="flex gap-3">
+            <button onclick="closeModals()"
+                class="flex-1 px-4 py-2 border border-gray-300 rounded text-gray-700 font-medium hover:bg-gray-50">
+                Cancel
+            </button>
+            <button onclick="showStep2()"
+                class="flex-1 px-4 py-2 bg-red-500 text-white font-bold rounded hover:bg-red-600">
+                Yes, Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Step 2 Confirmation Modal -->
+<div id="modal-step2" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl p-8 max-w-md w-full mx-4">
+        <h3 class="text-xl font-bold text-red-600 mb-2">Final Confirmation</h3>
+        <p class="text-gray-500 text-sm mb-4">
+            This will permanently delete the assessment report and all responses.
+            Type <span class="font-bold text-red-600">DELETE</span> below to confirm.
+        </p>
+        <input type="text" id="confirm-input"
+            placeholder="Type DELETE here"
+            class="w-full border border-gray-300 rounded px-3 py-2 text-sm mb-4 focus:outline-none focus:border-red-400">
+        <p id="confirm-error" class="text-red-500 text-xs mb-3 hidden">
+            Please type DELETE exactly to confirm.
+        </p>
+        <div class="flex gap-3">
+            <button onclick="closeModals()"
+                class="flex-1 px-4 py-2 border border-gray-300 rounded text-gray-700 font-medium hover:bg-gray-50">
+                Cancel
+            </button>
+            <button onclick="submitDelete()"
+                class="flex-1 px-4 py-2 bg-red-600 text-white font-bold rounded hover:bg-red-700">
+                Permanently Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<form id="delete-form" method="POST" style="display:none;"></form>
+
+<script>
+let currentAssessmentId = null;
+
+function confirmDelete(assessmentId, dateStr) {
+    currentAssessmentId = assessmentId;
+    document.getElementById('modal-date').textContent = dateStr;
+    document.getElementById('modal-step1').classList.remove('hidden');
+}
+
+function showStep2() {
+    document.getElementById('modal-step1').classList.add('hidden');
+    document.getElementById('modal-step2').classList.remove('hidden');
+    document.getElementById('confirm-input').value = '';
+    document.getElementById('confirm-error').classList.add('hidden');
+}
+
+function closeModals() {
+    document.getElementById('modal-step1').classList.add('hidden');
+    document.getElementById('modal-step2').classList.add('hidden');
+    document.getElementById('confirm-input').value = '';
+    currentAssessmentId = null;
+}
+
+function submitDelete() {
+    const input = document.getElementById('confirm-input').value.trim();
+    if (input !== 'DELETE') {
+        document.getElementById('confirm-error').classList.remove('hidden');
+        return;
+    }
+    const form = document.getElementById('delete-form');
+    form.action = `/assessment/delete/${currentAssessmentId}`;
+    form.submit();
+}
+
+document.getElementById('modal-step1').addEventListener('click', function(e) {
+    if (e.target === this) closeModals();
+});
+document.getElementById('modal-step2').addEventListener('click', function(e) {
+    if (e.target === this) closeModals();
+});
+</script>
 {% endblock %}

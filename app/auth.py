@@ -6,6 +6,13 @@ from app import db, limiter
 
 auth = Blueprint('auth', __name__)
 
+@auth.route('/landing')
+def landing():
+    from flask_login import current_user
+    if current_user.is_authenticated:
+        return redirect(url_for('main.dashboard'))
+    return render_template('auth/landing.html')
+
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
@@ -58,7 +65,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('auth.register'))
+    return redirect(url_for('auth.landing'))
 
 
 @auth.route('/forgot-password')
