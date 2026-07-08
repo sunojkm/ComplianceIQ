@@ -4,6 +4,7 @@ from app.models import Assessment, Response
 from app import db
 from app.questions import QUESTIONS
 from datetime import datetime
+from app.pdf_report import clean
 
 assessment = Blueprint('assessment', __name__)
 
@@ -61,10 +62,22 @@ def results():
     current_assessment = Assessment.query.get(assessment_id)
     responses = Response.query.filter_by(assessment_id=assessment_id).all()
 
+    # Overall scoring
     total_possible = sum(q['weight'] for q in QUESTIONS)
     total_scored   = sum(r.score for r in responses)
     score_pct      = round((total_scored / total_possible) * 100) if total_possible else 0
 
+    # Theme-level scoring
+    themes = ['Organisational', 'People', 'Physical', 'Technological']
+    theme_scores = {}
+    for theme in themes:
+        theme_qs = [q for q in QUESTIONS if q['theme'] == theme]
+        theme_possible = sum(q['weight'] for q in theme_qs)
+        theme_ids = [q['id'] for q in theme_qs]
+        theme_scored = sum(r.score for r in responses if r.question_id in theme_ids)
+        theme_scores[theme] = round((theme_scored / theme_possible) * 100) if theme_possible else 0
+
+    # Risk level
     if score_pct >= 80:
         risk_level = 'Low'
     elif score_pct >= 60:
@@ -74,12 +87,13 @@ def results():
     else:
         risk_level = 'Critical'
 
+    # Save to DB
     current_assessment.overall_score = score_pct
     current_assessment.risk_level    = risk_level
     current_assessment.completed_at  = datetime.utcnow()
     db.session.commit()
 
-    # Identify weaknesses
+    # Weaknesses
     weaknesses = []
     for r in responses:
         if r.answer == 'NO':
@@ -90,4 +104,50 @@ def results():
     return render_template('assessment/results.html',
                            score=score_pct,
                            risk_level=risk_level,
-                           weaknesses=weaknesses)
+                           weaknesses=weaknesses,
+                           theme_scores=theme_scores)
+@assessment.route('/assessment/download-pdf')
+@login_required
+def download_pdf():
+    from flask import make_response
+    from app.pdf_report import generate_pdf
+
+    assessment_id = session.get('assessment_id')
+    if not assessment_id:
+        return redirect(url_for('main.dashboard'))
+
+    current_assessment = Assessment.query.get(assessment_id)
+    responses = Response.query.filter_by(assessment_id=assessment_id).all()
+
+    # Theme scores
+    themes = ['Organisational', 'People', 'Physical', 'Technological']
+    theme_scores = {}
+    for theme in themes:
+        theme_qs = [q for q in QUESTIONS if q['theme'] == theme]
+        theme_possible = sum(q['weight'] for q in theme_qs)
+        theme_ids = [q['id'] for q in theme_qs]
+        theme_scored = sum(r.score for r in responses if r.question_id in theme_ids)
+        theme_scores[theme] = round((theme_scored / theme_possible) * 100) if theme_possible else 0
+
+    # Weaknesses
+    weaknesses = []
+    for r in responses:
+        if r.answer == 'NO':
+            q = next((x for x in QUESTIONS if x['id'] == r.question_id), None)
+            if q:
+                weaknesses.append(q)
+
+    pdf_bytes = generate_pdf(
+        company_name  = clean(current_user.company_name),
+        industry      = clean(current_user.industry),
+        business_size = clean(current_user.business_size),
+        score         = current_assessment.overall_score,
+        risk_level    = current_assessment.risk_level,
+        theme_scores  = theme_scores,
+        weaknesses    = weaknesses
+    )
+
+    response = make_response(pdf_bytes)
+    response.headers['Content-Type']        = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename=ComplianceIQ_Report_{current_user.company_name}.pdf'
+    return response

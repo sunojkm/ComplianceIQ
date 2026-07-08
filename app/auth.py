@@ -17,7 +17,7 @@ def register():
 
         user = User.query.filter_by(email=email).first()
         if user:
-            flash('Email already registered.')
+            flash('Email already registered.', 'error')
             return redirect(url_for('auth.register'))
 
         new_user = User(
@@ -29,6 +29,7 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
+        flash('Registration successful! Please sign in to continue.', 'success')
         return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html')
@@ -41,7 +42,7 @@ def login():
         user     = User.query.filter_by(email=email).first()
 
         if not user or not check_password_hash(user.password, password):
-            flash('Invalid credentials.')
+            flash('Invalid credentials. Please check your email and password.', 'error')
             return redirect(url_for('auth.login'))
 
         login_user(user)
@@ -53,7 +54,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('auth.register'))
 
 @auth.route('/forgot-password')
 def forgot_password():

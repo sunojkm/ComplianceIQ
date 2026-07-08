@@ -26,4 +26,43 @@
         </div>
     </form>
 </div>
+{% if index == total - 1 %}
+<div id="completion-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl p-8 max-w-md w-full mx-4 text-center">
+        <div class="text-5xl mb-4">✅</div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Questionnaire Complete!</h2>
+        <p class="text-gray-500 text-sm mb-6">You have answered all 43 ISO 27001 Annex A questions. Click below to view your compliance score and results.</p>
+        <button onclick="submitFinal()"
+            class="w-full bg-gray-900 text-yellow-400 font-bold py-3 rounded-lg hover:bg-gray-800 text-lg">
+            View My Results →
+        </button>
+    </div>
+</div>
+
+<script>
+    // Show popup when YES or NO is clicked on the last question
+    document.querySelectorAll('button[name="answer"]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const answer = this.value;
+            document.getElementById('completion-modal').classList.remove('hidden');
+            // Store the answer to submit when they click View Results
+            window._lastAnswer = answer;
+        });
+    });
+
+    function submitFinal() {
+        // Create and submit the form programmatically
+        const form = document.querySelector('form');
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'answer';
+        input.value = window._lastAnswer;
+        form.appendChild(input);
+        // Remove the YES/NO buttons to avoid double submit
+        document.querySelectorAll('button[name="answer"]').forEach(b => b.remove());
+        form.submit();
+    }
+</script>
+{% endif %}
 {% endblock %}
