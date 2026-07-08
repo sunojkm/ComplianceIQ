@@ -5,8 +5,15 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.x-black?logo=flask)](https://flask.palletsprojects.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Phase%202%20Complete-green)]()
+[![Status](https://img.shields.io/badge/Status-Live%20%E2%9C%85-brightgreen)]()
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-complianceiq--dsgi.onrender.com-yellow)](https://complianceiq-dsgi.onrender.com)
 [![GitHub](https://img.shields.io/badge/GitHub-sunojkm%2FComplianceIQ-lightgrey?logo=github)](https://github.com/sunojkm/ComplianceIQ)
+
+---
+
+## 🔗 Live Demo
+
+**[https://complianceiq-dsgi.onrender.com](https://complianceiq-dsgi.onrender.com)**
 
 ---
 
@@ -19,7 +26,7 @@ ComplianceIQ is a free, open-source, web-based security risk assessment tool des
 - **Physical** — 8 questions (A.7.x controls)
 - **Technological** — 15 questions (A.8.x controls)
 
-No compliance expertise required. Any business owner who understands English can complete a full ISO 27001 gap assessment and receive a prioritised action plan.
+No compliance expertise required. Any business owner who understands English can complete a full ISO 27001 gap assessment and receive a prioritised action plan — for free.
 
 ---
 
@@ -38,40 +45,69 @@ Enterprise GRC platforms (ServiceNow GRC, OneTrust) cost thousands per year and 
 
 ## Features
 
-### Current (Phase 2 — Complete)
-- ✅ User registration and login with company onboarding
-- ✅ Industry and business size selection
-- ✅ 43-question ISO 27001 Annex A assessment — one question per page
-- ✅ Progress bar tracking across all questions
-- ✅ Weighted scoring engine — criticality weights 1 (Advisory), 2 (Important), 3 (Critical)
-- ✅ Theme-level risk scores — Organisational, People, Physical, Technological
-- ✅ Overall compliance percentage with four-tier risk classification
-- ✅ Colour-coded risk banner — Low / Medium / High / Critical
-- ✅ Identified weaknesses accordion — expandable list of failed controls
-- ✅ Recommended control checklist accordion — specific remediation per control
-- ✅ Password show/hide toggle on login and register pages
-- ✅ Forgot password placeholder page
-- ✅ CSRF protection (Flask-WTF)
-- ✅ HTTP security headers (Flask-Talisman)
-- ✅ Secure password hashing (Werkzeug bcrypt)
+### ✅ Currently Live
 
-### Planned (Phase 4 — Weeks 9–13)
-- 🔲 Chart.js radar dashboard — theme-level compliance visualisation
-- 🔲 FPDF2 PDF report — downloadable weaknesses report + control checklist
-- 🔲 Deployment to Render with PostgreSQL
-- 🔲 Password reset via Flask-Mail with email token
-- 🔲 Assessment history and progress tracking
+**Authentication & Onboarding**
+- Landing page with tool overview and risk classification guide
+- User registration with company name, industry, business size
+- Login with show/hide password toggle
+- Rate-limited login — 5 attempts per minute (brute force protection)
+- Privacy disclaimer on registration
+- Logout redirects to landing page
+
+**Assessment Engine**
+- 43-question ISO 27001 Annex A assessment — one question per page
+- Progress bar tracking across all 43 questions
+- Completion popup after final question
+- Weighted scoring engine — criticality weights 1 (Advisory), 2 (Important), 3 (Critical)
+- Theme-level risk scores — Organisational, People, Physical, Technological
+- Overall compliance percentage with four-tier risk classification
+
+**Results & Reporting**
+- Colour-coded risk banner — Low / Medium / High / Critical
+- Chart.js radar chart — theme-level compliance visualisation
+- Theme-level progress bars with colour coding
+- Identified weaknesses accordion — expandable per control with criticality badge
+- Recommended control checklist accordion — expandable per control with remediation action
+- PDF report download — identified weaknesses + recommended control checklist
+- Download popup with spinner and completion confirmation
+
+**Dashboard & History**
+- User dashboard with previous assessments list
+- View any past assessment report
+- Delete assessment with double confirmation (type DELETE to confirm)
+- Profile page — update company details and change password
+- Assessment count and account information
+
+**Security (OWASP Guidelines — ISO 27001 A.8.26)**
+- Passwords hashed with Werkzeug bcrypt — never stored in plaintext
+- CSRF protection via Flask-WTF on all forms
+- HTTP security headers via Flask-Talisman (CSP, HSTS, X-Frame-Options)
+- Rate limiting on login via Flask-Limiter
+- Secret key stored as environment variable — not in source code
+- `.gitignore` excludes `.env`, `.db`, `venv/`, `__pycache__/`
+
+### 🔲 Post-Course Roadmap
+
+- Remaining 50 ISO 27001 Annex A controls — full Annex A coverage (93 controls)
+- NIST CSF 2.0 gap-fill layer — supplementary recommendations where ISO 27001 falls short
+- GDPR compliance module — for EU-based organisations
+- HIPAA, PCI-DSS, SOC 2, HITRUST — community contributions for broader industry coverage
+- AI-assisted scoring layer
+- Public REST API for GRC analyst integrations
+
+All planned expansions are documented in [ROADMAP.md](ROADMAP.md).
 
 ---
 
 ## Risk Classification
 
-| Risk Level | Score Range | Meaning |
-|---|---|---|
-| 🟢 Low | 80–100% | Strong compliance — most controls in place |
-| 🟡 Medium | 60–79% | Reasonable posture with notable gaps |
-| 🟠 High | 40–59% | Significant gaps — elevated risk |
-| 🔴 Critical | 0–39% | Severe gaps — immediate action required |
+| Risk Level | Score Range | Meaning | Action |
+|---|---|---|---|
+| 🟢 Low | 80–100% | Strong compliance — most controls in place | Maintain and schedule annual review |
+| 🟡 Medium | 60–79% | Reasonable posture with notable gaps | Address gaps within 3 months |
+| 🟠 High | 40–59% | Significant gaps — elevated risk | Prioritise Critical controls immediately |
+| 🔴 Critical | 0–39% | Severe gaps — immediate action required | Escalate to management now |
 
 ---
 
@@ -81,14 +117,14 @@ Enterprise GRC platforms (ServiceNow GRC, OneTrust) cost thousands per year and 
 |---|---|
 | Backend | Python 3.11+, Flask |
 | Authentication | Flask-Login, Werkzeug (bcrypt) |
-| Security | Flask-WTF (CSRF), Flask-Talisman (HTTP headers) |
+| Security | Flask-WTF (CSRF), Flask-Talisman (HTTP headers), Flask-Limiter (rate limiting) |
 | Database | SQLite (dev) → PostgreSQL on Render (production) |
 | ORM | SQLAlchemy |
 | Frontend | HTML, Tailwind CSS (CDN) |
-| Charts | Chart.js (planned) |
-| PDF Reports | FPDF2 (planned) |
-| Deployment | Render (planned) |
-| Testing | Pytest (planned) |
+| Charts | Chart.js (CDN) |
+| PDF Reports | FPDF2 |
+| Deployment | Render (free tier) |
+| Version Control | GitHub (MIT licence) |
 
 ---
 
@@ -126,7 +162,7 @@ source venv/bin/activate
 
 **4. Install dependencies**
 ```bash
-pip install flask flask-sqlalchemy flask-login flask-wtf flask-talisman werkzeug fpdf2
+pip install -r requirements.txt
 ```
 
 **5. Run the application**
@@ -145,94 +181,106 @@ http://127.0.0.1:5000
 
 ```
 ComplianceIQ/
-├── run.py                          # Application entry point
+├── run.py                              # Application entry point
+├── requirements.txt                    # Python dependencies
+├── render.yaml                         # Render deployment config
 ├── app/
-│   ├── __init__.py                 # Application factory — Flask, SQLAlchemy, blueprints
-│   ├── models.py                   # Database models — User, Assessment, Response
-│   ├── questions.py                # All 43 ISO 27001 Annex A questions
-│   ├── auth.py                     # Authentication blueprint — register, login, logout
-│   ├── main.py                     # Main blueprint — dashboard
-│   ├── assessment.py               # Assessment blueprint — questionnaire, scoring, results
+│   ├── __init__.py                     # Application factory
+│   ├── models.py                       # Database models — User, Assessment, Response
+│   ├── questions.py                    # All 43 ISO 27001 Annex A questions
+│   ├── pdf_report.py                   # FPDF2 PDF report generator
+│   ├── auth.py                         # Auth blueprint — register, login, logout, landing
+│   ├── main.py                         # Main blueprint — dashboard, profile
+│   ├── assessment.py                   # Assessment blueprint — questionnaire, scoring, results
 │   ├── templates/
-│   │   ├── base.html               # Base template — navigation and layout
+│   │   ├── base.html                   # Base template — navigation bar
 │   │   ├── auth/
-│   │   │   ├── login.html          # Login page
-│   │   │   ├── register.html       # Registration page
-│   │   │   └── forgot_password.html# Forgot password placeholder
+│   │   │   ├── landing.html            # Landing page
+│   │   │   ├── login.html              # Login page
+│   │   │   ├── register.html           # Registration page
+│   │   │   └── forgot_password.html    # Forgot password placeholder
 │   │   ├── main/
-│   │   │   └── dashboard.html      # User dashboard
-│   │   └── assessment/
-│   │       ├── question.html       # Individual question page
-│   │       └── results.html        # Assessment results with accordions
+│   │   │   ├── dashboard.html          # User dashboard with history
+│   │   │   └── profile.html            # Profile and password change
+│   │   └── results/
+│   │       └── results.html            # Assessment results with chart and accordions
 │   └── static/
-│       ├── css/                    # Custom stylesheets
-│       └── js/                     # Custom scripts
-├── tests/                          # Pytest test suite (planned)
-├── .gitignore                      # Excludes venv, db, .env, __pycache__
-└── README.md                       # This file
+│       ├── css/                        # Custom stylesheets
+│       └── js/                         # Custom scripts
+├── .gitignore                          # Excludes venv, db, .env, __pycache__
+├── README.md                           # This file
+└── ROADMAP.md                          # Post-course expansion plan
 ```
 
 ---
 
 ## How It Works
 
-### 1. Register
-Create an account with your company name, industry, business size, email, and password.
+### 1. Land & Register
+Visit the landing page to learn about the tool. Register with your company name, industry, business size, email, and password.
 
 ### 2. Start Assessment
-Click **Start Assessment** on the dashboard to begin the 43-question ISO 27001 Annex A questionnaire.
+Click **Start New Assessment** on the dashboard to begin the 43-question ISO 27001 Annex A questionnaire.
 
 ### 3. Answer Questions
-Each question maps to a specific ISO 27001 Annex A control. The control reference, theme, and criticality weight are displayed alongside the question. Answer **YES** or **NO**.
+Each question shows the ISO 27001 control reference, theme, and criticality badge (red Critical / yellow Important / green Advisory). Answer **YES** or **NO**. A progress bar tracks your position through all 43 questions.
 
 ### 4. View Results
-After completing all 43 questions, the results page displays:
-- Your overall compliance percentage and risk level
-- **Identified Weaknesses** — every failed control listed by theme and criticality
-- **Recommended Control Checklist** — specific ISO 27001 remediation action for each gap
+After completing all questions, the results page shows:
+- Overall compliance percentage and risk level
+- Radar chart and theme-level progress bars
+- **Identified Weaknesses** — every failed control by theme and criticality
+- **Recommended Control Checklist** — specific ISO 27001 remediation action per gap
+
+### 5. Download PDF Report
+Click **Download PDF Report** to get a branded PDF containing your weaknesses report and recommended control checklist.
+
+### 6. Track Progress
+Return to the dashboard to view past assessments, compare scores over time, or start a new assessment after implementing controls.
 
 ---
 
 ## Question Scope
 
-ISO 27001:2022 Annex A contains 93 controls in total. The MVP covers 43 — selected by **criticality weight** and **SMB applicability**. This prioritises controls with the highest impact on security posture while excluding controls impractical for organisations of 1–50 employees.
+ISO 27001:2022 Annex A contains 93 controls. The MVP covers 43 — selected by **criticality weight** and **SMB applicability**. This prioritises controls with the highest impact on security posture while excluding controls impractical for 1–50 employee organisations.
 
-This approach is consistent with how GRC consultants scope ISO 27001 assessments for smaller organisations — addressing the highest-risk controls first and expanding coverage incrementally.
-
-**The remaining 50 controls are on the roadmap** for post-course community contributions.
+The remaining 50 controls are on the post-course roadmap for community contribution.
 
 ---
 
 ## Security
 
-ComplianceIQ is built following **OWASP secure coding guidelines**, reflecting ISO 27001 A.8.26 (Application Security) in practice:
+Built following **OWASP secure coding guidelines** — reflecting ISO 27001 A.8.26 (Application Security) in practice:
 
-- All passwords hashed with **Werkzeug bcrypt** — never stored in plaintext
+- Passwords hashed with **Werkzeug bcrypt** — never stored in plaintext
 - **Flask-WTF** provides CSRF token protection on all forms
 - **Flask-Talisman** enforces HTTP security headers (CSP, HSTS, X-Frame-Options)
-- `.env` file excluded from version control via `.gitignore`
-- **pip-audit** used periodically to scan for vulnerable dependencies
+- **Flask-Limiter** rate limits login to 5 attempts per minute
+- Secret key stored as **environment variable** — not in source code
+- `.gitignore` excludes `.env`, `.db`, and `venv/` from version control
+
+---
+
+## Deployment
+
+The application is deployed on **Render** (free tier):
+
+- **Live URL:** https://complianceiq-dsgi.onrender.com
+- **Database:** SQLite (local) / PostgreSQL (Render)
+- **Start Command:** `gunicorn run:app`
+- **Auto-deploy:** Every push to `main` branch triggers a new deployment
+
+> Note: Free Render instances spin down after periods of inactivity. The app may take 30–60 seconds to wake up on first visit.
 
 ---
 
 ## Roadmap
 
-### Phase 4 — Dashboard, PDF & Deployment (Weeks 9–13)
-- Chart.js radar chart showing theme-level compliance scores
-- FPDF2 downloadable PDF report (weaknesses report + control checklist)
-- Full deployment to Render with PostgreSQL
-- Password reset via Flask-Mail
-
-### Post-Course Expansions
-- **Remaining 50 ISO 27001 controls** — full Annex A coverage across all 93 controls
-- **NIST CSF 2.0 gap-fill layer** — supplementary recommendations where ISO 27001 falls short (detection, response, governance)
-- **GDPR compliance module** — for EU-based organisations
-- **HIPAA** — healthcare data protection (community contribution)
-- **PCI-DSS** — payment card security (community contribution)
-- **SOC 2** — technology and SaaS (community contribution)
-- **HITRUST** — healthcare enterprise (community contribution)
-
-All planned expansions are tracked in [ROADMAP.md](ROADMAP.md).
+See [ROADMAP.md](ROADMAP.md) for the full post-course expansion plan including:
+- Remaining 50 ISO 27001 Annex A controls
+- NIST CSF 2.0 gap-fill layer
+- GDPR compliance module
+- HIPAA, PCI-DSS, SOC 2, HITRUST (community contributions)
 
 ---
 
@@ -249,8 +297,10 @@ You are free to use, modify, and distribute this software for any purpose, inclu
 - [ISO/IEC 27001:2022](https://www.iso.org/standard/27001) — Information Security Management Standard
 - [Flask](https://flask.palletsprojects.com) — Lightweight Python web framework
 - [Tailwind CSS](https://tailwindcss.com) — Utility-first CSS framework
+- [Chart.js](https://www.chartjs.org) — JavaScript charting library
+- [FPDF2](https://py-fpdf2.readthedocs.io) — Python PDF generation library
 - [OWASP](https://owasp.org) — Secure coding guidelines
 
 ---
 
-*Built with Python and Flask · Open source under MIT Licence · github.com/sunojkm/ComplianceIQ*
+*Built with Python and Flask · Open source under MIT Licence · Live at [complianceiq-dsgi.onrender.com](https://complianceiq-dsgi.onrender.com)*
