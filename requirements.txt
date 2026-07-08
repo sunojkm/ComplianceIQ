@@ -3,6 +3,7 @@ flask-sqlalchemy
 flask-login
 flask-wtf
 flask-talisman
+flask-limiter
 werkzeug
 fpdf2
 gunicorn
