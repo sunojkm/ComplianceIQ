@@ -7,8 +7,8 @@ import os
 
 db = SQLAlchemy()
 login_manager = LoginManager()
-limiter = Limiter(get_remote_address, default_limits=["10000 per day", "500 per hour"])
-# limiter = Limiter(get_remote_address, default_limits=[])
+# limiter = Limiter(get_remote_address, default_limits=["10000 per day", "500 per hour"])
+limiter = Limiter(get_remote_address, default_limits=[])
 
 def create_app():
     app = Flask(__name__)
